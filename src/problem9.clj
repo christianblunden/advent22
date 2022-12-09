@@ -7,12 +7,9 @@
 ;; (def input (load-data "resources/input9-example.txt"))
 (def input (load-data "resources/input9.txt"))
 
-(def cmds {"R" [1 0]
-           "L" [-1 0]
-           "U" [0 1]
-           "D" [0 -1]})
+(def cmds {"R" [1 0] "L" [-1 0] "U" [0 1] "D" [0 -1]})
 
-(defn process-command2 [[head & rest] cmd]
+(defn process-command [[head & rest] cmd]
   (reduce (fn [heads tail]
             (let [head (last heads)
                   diff (mapv - head tail)]
@@ -26,10 +23,10 @@
   (->> input
      (map (fn [[cmd n]] (repeat n cmd)))
      flatten
-     (reductions process-command2 (repeat n [0 0]))
+     (reductions process-command (repeat n [0 0]))
      (map last)
      distinct
      count))
 
-(knots 2)
-(knots 10)
+(time (knots 2)) ; "Elapsed time: 70.568384 msecs"
+(time (knots 10)) ; "Elapsed time: 242.468347 msecs"
