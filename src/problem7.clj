@@ -1,6 +1,5 @@
 (ns problem7
-  (:require [clojure.java.io :as io]
-            [clojure.walk :as walk]))
+  (:require [clojure.java.io :as io]))
 
 ;; (def input (->> "resources/input7-example.txt" io/reader line-seq))
 (def input (->> "resources/input7.txt" io/reader line-seq))
