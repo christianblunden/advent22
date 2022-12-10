@@ -8,7 +8,7 @@
 ;; (def input (load-data "resources/input10-example.txt"))
 (def input (load-data "resources/input10.txt"))
 
-(defn signals2 [input]
+(defn cycles [input]
   (reduce (fn [result [cmd reg]]
             (let [{:keys [cycle x] :as prev} (last result)]
               (cond-> result
@@ -17,21 +17,18 @@
           [{:cycle 1 :x 1}]
           input))
 
-; part1
-(->> [19 59 99 139 179 219]
-     (map #(nth (signals2 input) %))
-     (map #(apply * (vals %)))
-     (reduce +))
+; part1 "Elapsed time: 0.997391 msecs"
+(time (->> [19 59 99 139 179 219]
+           (map (partial nth (cycles input)))
+           (map #(apply * (vals %)))
+           (reduce +)))
 
-;; part2
-(defn crt2 [{:keys [cycle x]}]
-  {:cycle cycle
-   :x x
-   :crt (mod (dec cycle) 40)
-   :pixel (if (<= (dec x) (mod (dec cycle) 40) (inc x)) "#" ".")})
+(defn crt [{:keys [cycle x]}]
+  (if (<= (dec x) (mod (dec cycle) 40) (inc x)) "#" "."))
 
-(->> input
-     signals2
-     (map (comp :pixel crt2))
-     (partition-all 40)
-     (map #(apply str %)))
+;; part2 "Elapsed time: 0.941747 msecs"
+(time (->> input
+           cycles
+           (map crt)
+           (partition-all 40)
+           (map #(apply str %))))
