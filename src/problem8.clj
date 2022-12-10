@@ -1,6 +1,5 @@
 (ns problem8
-  (:require [clojure.java.io :as io]
-            [clojure.core.matrix :as m]))
+  (:require [clojure.core.matrix :as m]))
 
 (m/set-current-implementation :ndarray)
 
@@ -28,7 +27,8 @@
          (m/emap-indexed (fn [i _] (if (or (boundary? i s) (any-visble? i)) 1 0)))
          (m/ereduce +))))
 
-(count-trees input) ;; part1
+;; part 1 "Elapsed time: 900.350163 msecs"
+(time (count-trees input))
 
 ;; part2
 (defn take-until [x xs]
@@ -39,7 +39,7 @@
           []
           xs))
 
- (defn count-trees [[dim i n]]
+ (defn count-trees2 [[dim i n]]
   (let [xs (m/slice-view input dim i)
         [l [x & r]] (split-at n xs)]
     [(count (take-until x (reverse l))) 
@@ -47,8 +47,9 @@
 
 (defn viewing-score [[col row] _]
   (->> [[0 row col] [1 col row]]
-       (map count-trees)
+       (map count-trees2)
        flatten
        (reduce *)))
 
-(m/emax (m/emap-indexed viewing-score input))
+;; part 2 "Elapsed time: 802.626502 msecs"
+(time (m/emax (m/emap-indexed viewing-score input)))
