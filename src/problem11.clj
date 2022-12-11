@@ -7,7 +7,7 @@
    :on-inspection (->> op (re-find #"([*+]) (old|\d+)") rest (map read-string))
    :test (Integer/parseInt (re-find #"\d+" test))
    :throws-to {true (Integer/parseInt (re-find #"\d+" truthy))
-            false (Integer/parseInt (re-find #"\d+" falsy))}
+               false (Integer/parseInt (re-find #"\d+" falsy))}
    :count 0})
 (defn load-data [f] (->> f io/reader line-seq (partition-all 7) (mapv parse-group)))
 ;; (def input (load-data "resources/input11-example.txt"))
@@ -17,30 +17,33 @@
   (comp (map #(stress-fn ((resolve f) % (if (number? val) val %)) divisor))
         (map #(vector (throws-to (zero? (mod % test))) %))))
 
-(defn round2 [process-fn troop]
-  (reduce (fn [new-troop {:keys [index] :as m}]
-            (transduce (process-fn m)
-                       (completing
-                        (fn [agg [new-index item]]
-                          (-> agg
-                              (update-in [index :count] inc)
-                              (update-in [index :items] (comp vec rest))
-                              (update-in [new-index :items] conj item))))
+(defn do-round [troop]
+  (reduce (fn [new-troop {:keys [index pass-fn]}]
+            (transduce pass-fn
+                       (completing (fn [agg [new-index item]]
+                                     (-> agg
+                                         (update-in [index :count] inc)
+                                         (update-in [index :items] (comp vec rest))
+                                         (update-in [new-index :items] conj item))))
                        new-troop
                        (get-in new-troop [index :items])))
           troop
           troop))
 
-(defn monkey-play [n xf input]
+(defn monkey-play [n input]
   (->> (range n)
-       (reduce (fn [rnd _] (round2 xf rnd)) input)
+       (reduce (fn [rnd _] (do-round rnd)) input)
        (map :count)
        (sort >)
        (take 2)
        (apply *)))
 
-;; part 1 "Elapsed time: 2.369649 msecs"
-(time (monkey-play 20 #(process-items quot 3 %) input))
+;; part 1 "Elapsed time: 2.31034 msecs"
+(time (->> input
+           (mapv #(assoc % :pass-fn (process-items quot 3 %)))
+           (monkey-play 20)))
 
-;; part 2 "Elapsed time: 873.787519 msecs"
-(time (monkey-play 10000 #(process-items mod (transduce (map :test) * input) %) input))
+;; part 2 "Elapsed time: 830.240263 msecs"
+(time (->> input
+           (mapv #(assoc % :pass-fn (process-items mod (transduce (map :test) * input) %)))
+           (monkey-play 10000)))
