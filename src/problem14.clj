@@ -52,7 +52,7 @@
 (defn total-sand [m]
   (as-> m x
       (m/emap (comp int first) x)
-      (m/eq x 111)
+      (m/eq x (int \o))
       (m/esum x)))
 
 ;; part 1
@@ -74,7 +74,7 @@
 (let [ys (->> input flatten (drop 1) (take-nth 2))
       [_ max-y] (minmax ys)
       sand-start (mapv - start [0 0])
-      input (concat input [[[0 (+ max-y 2)] [1000 (+ max-y 2)]]]) ; add floor
+      input (concat input [[[0 (+ max-y 2)] [1000 (+ max-y 2)]]]) ; add floor.. assume 1000 will be wide enough
       grid (draw-grid input (+ max-y 3) 1001 0)]
   (->> (range)
        (reduce (fn [grid' _]
