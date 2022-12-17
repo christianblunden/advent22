@@ -1,3 +1,4 @@
 {:paths ["src" "resources"]
+ :jvm-opts ["-Xmx8G"]
  :deps {net.mikera/core.matrix {:mvn/version "0.62.0"}
         net.mikera/vectorz-clj {:mvn/version "0.48.0"}}}
